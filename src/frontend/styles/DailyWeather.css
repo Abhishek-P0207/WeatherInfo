@@ -1,0 +1,21 @@
+/* @import "tailwindcss";    */
+
+.parent-box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid indigo;
+}
+
+.weather-info-box{
+    display: flex;
+    justify-content: center;
+    height: 500px;
+    width: 75%;
+}
