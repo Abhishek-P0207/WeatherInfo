@@ -1,133 +1,190 @@
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { useState, useEffect } from 'react';
+import { RxArrowTopRight } from 'react-icons/rx';
+import { FiWind } from "react-icons/fi";
+import Slider from 'react-slick';
+import allLogo from "../../assets/*.svg"
+import bgImage from "../../assets/bg2.jpg"
+
+const allLogos = import.meta.glob("../../assets/weather-icons-master/weather-icons-master/production/fill/all/*.svg", { eager: true })
 
 
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function WeatherCards() {
+    const [weatherData, setWeatherData] = useState<{
+        location: string;
+        main: any;
+        weather: any[];
+        wind: any;
+        aqi: string;
+    } | null>(null);
 
-    const tiers = [
-        {
-            name: 'Hobby',
-            id: 'tier-hobby',
-            href: '#',
-            priceMonthly: '$29',
-            description: "The perfect plan if you're just getting started with our product.",
-            features: ['25 products', 'Up to 10,000 subscribers', 'Advanced analytics', '24-hour support response time'],
-            featured: false,
-        },
-        {
-            name: 'Enterprise',
-            id: 'tier-enterprise',
-            href: '#',
-            priceMonthly: '$99',
-            description: 'Dedicated support and infrastructure for your company.',
-            features: [
-                'Unlimited products',
-                'Unlimited subscribers',
-                'Advanced analytics',
-                'Dedicated support representative',
-                'Marketing automations',
-                'Custom integrations',
-            ],
-            featured: true,
-        },
-        {
-            name: 'Hobby',
-            id: 'tier-hobby',
-            href: '#',
-            priceMonthly: '$29',
-            description: "The perfect plan if you're just getting started with our product.",
-            features: ['25 products', 'Up to 10,000 subscribers', 'Advanced analytics', '24-hour support response time'],
-            featured: false,
-        },
-    ]
+    const lat = 28.6139;
+    const lon = 77.2090;
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                await getWeatherData();
+            } catch (error) {
+                console.error("Error fetching weather data:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    async function getWeatherData() {
+        try {
+            const response = await fetch(`http://localhost:3000/weather?lat=${lat}&lon=${lon}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const pollution = await fetch(`http://localhost:3000/pollution?lat=${lat}&lon=${lon}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            const data2 = await pollution.json();
+            const specific = {
+                location: data.name,
+                main: data.main,
+                weather: data.weather,
+                wind: data.wind,
+                aqi: data2.list[0].main.aqi,
+            };
+            console.log(specific);
+            setWeatherData(specific);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const settings = {
+        dots: true,
+        arrows: true,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        scroll:true,
+        swipe: true,
+        swipeToSlide: true,
+        draggable: true,
+        touchThreshold: 10,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                },
+            },
+            {
+                breakpoint: 640,
+                settings: {
+                    slidesToShow: 1,
+                },
+            },
+        ],
+    };
 
     return (
-        <div className="relative isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-            <div aria-hidden="true" className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl">
-                <div
-                    style={{
-                        clipPath:
-                            'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                    }}
-                    className="mx-auto aspect-1155/678 w-288.75 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
-                />
-            </div>
-            <div className="mx-auto max-w-4xl text-center">
-                <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl">
-                    Choose the right plan for you
-                </p>
-            </div>
+        <div className="bg-no-repeat bg-cover bg-center" style={{backgroundImage: `url(${bgImage})`}}>
+            <header className="sticky top-0 pt-5 pl-3 w-full h-16 text-center">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl md:text-4xl font-bold pl-5 text-white">WeatherInfo</h1>
+                </div>
+            </header>
 
-            <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
-                {tiers.map((tier, tierIdx) => (
-                    <div
-                        key={tier.id}
-                        className={classNames(
-                            tier.featured ? 'relative bg-gray-900 shadow-2xl' : 'bg-white/60 sm:mx-8 lg:mx-0',
-                            tier.featured
-                                ? ''
-                                : tierIdx === 0
-                                    ? 'rounded-t-3xl sm:rounded-b-none lg:rounded-tr-none lg:rounded-bl-3xl'
-                                    : 'sm:rounded-t-none lg:rounded-tr-3xl lg:rounded-bl-none',
-                            'rounded-3xl p-8 ring-1 ring-gray-900/10 sm:p-10',
-                        )}
-                    >
-                        <h3
-                            id={tier.id}
-                            className={classNames(tier.featured ? 'text-indigo-400' : 'text-indigo-600', 'text-base/7 font-semibold')}
-                        >
-                            {tier.name}
-                        </h3>
-                        <p className="mt-4 flex items-baseline gap-x-2">
-                            <span
-                                className={classNames(
-                                    tier.featured ? 'text-white' : 'text-gray-900',
-                                    'text-5xl font-semibold tracking-tight',
-                                )}
-                            >
-                                {tier.priceMonthly}
-                            </span>
-                            <span className={classNames(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-base')}>/month</span>
-                        </p>
-                        <p className={classNames(tier.featured ? 'text-gray-300' : 'text-gray-600', 'mt-6 text-base/7')}>
-                            {tier.description}
-                        </p>
-                        <ul
-                            role="list"
-                            className={classNames(
-                                tier.featured ? 'text-gray-300' : 'text-gray-600',
-                                'mt-8 space-y-3 text-sm/6 sm:mt-10',
-                            )}
-                        >
-                            {tier.features.map((feature) => (
-                                <li key={feature} className="flex gap-x-3">
-                                    <CheckIcon
-                                        aria-hidden="true"
-                                        className={classNames(tier.featured ? 'text-indigo-400' : 'text-indigo-600', 'h-6 w-5 flex-none')}
-                                    />
-                                    {feature}
-                                </li>
-                            ))}
-                        </ul>
-                        <a
-                            href={tier.href}
-                            aria-describedby={tier.id}
-                            className={classNames(
-                                tier.featured
-                                    ? 'bg-indigo-500 text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-indigo-500'
-                                    : 'text-indigo-600 ring-1 ring-indigo-200 ring-inset hover:ring-indigo-300 focus-visible:outline-indigo-600',
-                                'mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
-                            )}
-                        >
-                            Get started today
-                        </a>
+            <div className="flex justify-center items-center  h-[calc(100vh-4rem)] overflow-hidden">
+                {weatherData && (
+                    <div className="w-[90%] max-w-[1200px]">
+                        <Slider {...settings}>
+                            <WeatherCard
+                                title="Temperature"
+                                icon={'overcast-day'}
+                                value={`${weatherData.main.temp}°C`}
+                                temp_var={`Max:${weatherData.main.temp_max}°C  |  Min:${weatherData.main.temp_min}°C`}
+                                subtitle={weatherData.weather[0]?.description}
+                                location={weatherData.location}
+                            />
+                            <WeatherCard
+                                title="Humidity"
+                                icon={'humidity'}
+                                value={`${weatherData.main.humidity}%`}
+                                subtitle="Relative Humidity"
+                            />
+                            <WeatherCard
+                                title="Wind Speed"
+                                icon={'windsock'}
+                                value={`${weatherData.wind.speed} m/s`}
+                                subtitle="Wind Blowing Speed"
+                            />
+                            <WeatherCard
+                                title="Air Pollution"
+                                icon={'smoke-particles'}
+                                value={`${weatherData.aqi}`}
+                                subtitle="Air pollution"
+                            />
+                            <WeatherCard
+                                title="Pressure"
+                                icon={'barometer'}
+                                value={`${weatherData.main.pressure} hPa`}
+                                subtitle="Atmospheric Pressure"
+                            />
+                        </Slider>
                     </div>
-                ))}
+                )}
             </div>
         </div>
-    )
+    );
+}
+
+function WeatherCard({
+    title,
+    icon,
+    value,
+    subtitle,
+    location,
+    temp_var,
+}: {
+    title: string;
+    icon?: string;
+    value: string;
+    subtitle?: string | null;
+    location?: string | null;
+    temp_var?: string | null;
+}) {
+    return (
+        <div className="group relative shadow-lg text-black rounded-xl px-6 py-8 h-[250px] w-[215px] lg:h-[400px] lg:w-[350px] overflow-hidden cursor-pointer mx-2 transition-transform hover:scale-95">
+            <div className="absolute inset-0 opacity-90 bg-gradient-to-br from-[#7393B3] to-[#00000040] group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+            <div className="relative z-10 flex flex-col justify-between h-full">
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm uppercase text-gray-900">{title}</h2>
+                        {icon && (
+                            <div className="relative w-1/3 pb-[33%]">
+                                <img
+                                    src={allLogos[`../../assets/weather-icons-master/weather-icons-master/production/fill/all/${icon}.svg`]?.default}
+                                    alt="weather icon"
+                                    className="absolute inset-0 w-full h-full object-contain"
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <h1 className="text-2xl lg:text-4xl font-bold">{value}</h1>
+                    <p className="text-sm lg:text-base text-gray-900">{temp_var}</p>
+                    <p className="text-sm lg:text-base text-gray-700">{subtitle}</p>
+                </div>
+                <div className="text-sm text-gray-500 mt-4 flex items-center justify-between">
+                    <span>{location}</span>
+                    <RxArrowTopRight className="w-[25px] h-[25px] text-gray-600 group-hover:text-blue-500 group-hover:rotate-45 transition-transform duration-200" />
+                </div>
+            </div>
+        </div>
+    );
 }

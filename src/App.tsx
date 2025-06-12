@@ -7,10 +7,10 @@ import WeatherCards from './frontend/components/WeatherCards';
 function App() {
     return (
       <>
-        <DailyWeather></DailyWeather>
+        {/* <DailyWeather></DailyWeather> */}
         {/* <WeatherForecast></WeatherForecast> */}
 
-        {/* <WeatherCards></WeatherCards> */}
+        <WeatherCards></WeatherCards>
       </>
     )
 }

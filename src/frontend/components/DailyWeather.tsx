@@ -1,11 +1,8 @@
 import { useState, FormEvent } from "react";
 import "../styles/DailyWeather.css";
-import "./WeatherCards"
-import WeatherCards from "./WeatherCards";
 
 function DailyWeather() {
     const [weatherInfo, setWeatherInfo] = useState("");
-    const API_key = `ece46092f17257a807d9275278ce44a9`
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -17,16 +14,15 @@ function DailyWeather() {
         const lon = formJson.longitude;
 
         try {
-            const response = await fetch(`http://localhost:3000/weather?lat=${lat}&lon=${lon}&appid=${API_key}`, {
+            const response = await fetch(`http://localhost:3000/weather?lat=${lat}&lon=${lon}`, {
                 method: 'GET',
                 headers: {
                     'content-Type': 'application/json',
                 },
             })
             const data = await response.json();
-            const spec = {location : data.name, weather : data.main, desc : data.weather}
-            setWeatherInfo(JSON.stringify(spec, null, 2));
-            // {<WeatherCards response={spec} />}
+            const specific = {location : data.name, weather : data.main, desc : data.weather}
+            setWeatherInfo(JSON.stringify(specific, null, 2));
             console.log(data)
         }
         catch (err) {
